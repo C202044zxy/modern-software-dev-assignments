@@ -7,7 +7,19 @@ load_dotenv()
 NUM_RUNS_TIMES = 5
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You reverse words letter by letter. Output ONLY the reversed word with no other text, no quotes, no punctuation, no explanation.
+
+Examples:
+Input: hello
+Output: olleh
+
+Input: programming
+Output: gnimmargorp
+
+Input: keyboard
+Output: draobyek
+"""
 
 USER_PROMPT = """
 Reverse the order of letters in the following word. Only output the reversed word, no other text:
