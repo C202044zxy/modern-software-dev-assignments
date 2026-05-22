@@ -8,7 +8,18 @@ load_dotenv()
 NUM_RUNS_TIMES = 5
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+For Every response, use this format:
+
+<thinking>
+Work through the problem step by step. Show your reasoning. 
+check edge cases, and revise if needed.
+</thinking>
+
+<answer>
+state the full answer clearly. No restarted reasoning. 
+</answer>
+"""
 
 
 USER_PROMPT = """
@@ -56,6 +67,7 @@ def test_your_prompt(system_prompt: str) -> bool:
             options={"temperature": 0.3},
         )
         output_text = response.message.content
+        print(output_text)
         final_answer = extract_final_answer(output_text)
         if final_answer.strip() == EXPECTED_OUTPUT.strip():
             print("SUCCESS")
