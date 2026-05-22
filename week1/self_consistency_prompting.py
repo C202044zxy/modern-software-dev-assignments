@@ -9,7 +9,16 @@ load_dotenv()
 NUM_RUNS_TIMES = 5
 
 # TODO: Fill this in! Try to get as close to 100% correctness across all runs as possible.
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+For Every response, work through the problem step by step. Show your reasoning. Then state the answer use "Answer: <number>" format.
+
+<example>
+Q: There are 15 trees in the grove. Grove workers will plant trees in the grove today. After they are done,
+there will be 21 trees. How many trees did the grove workers plant today?
+A: We start with 15 trees. Later we have 21 trees. The difference must be the number of trees they planted.
+So, they must have planted 21 - 15 = 6 trees. Answer: 6.
+</example>
+"""
 
 USER_PROMPT = """
 Solve this problem, then give the final answer on the last line as "Answer: <number>".
