@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from rag.embeddings import TfIdfEmbedder
-from rag.generation import DEFAULT_SYSTEM_PROMPT, format_rag_prompt
-from rag.pipeline import RagPipeline
-from rag.retriever import Retriever
-from rag.types import Chunk, RetrievalResult
+from rag.rag.embeddings import TfIdfEmbedder
+from rag.rag.generation import DEFAULT_SYSTEM_PROMPT, format_rag_prompt
+from rag.rag.pipeline import RagPipeline
+from rag.rag.retriever import Retriever
+from rag.rag.types import Chunk, RetrievalResult
 
 from .conftest import FakeLLM
 

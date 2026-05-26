@@ -20,7 +20,7 @@ if str(_ASSIGNMENT_ROOT) not in sys.path:
 
 
 # Imported AFTER sys.path is set up.
-from rag.types import Document  # noqa: E402
+from rag.rag.types import Document  # noqa: E402
 
 
 @pytest.fixture

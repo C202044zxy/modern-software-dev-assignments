@@ -18,9 +18,9 @@ from __future__ import annotations
 
 from typing import Iterable, List
 
-from rag.embeddings import Embedder
-from rag.types import Chunk, EmbeddedChunk, RetrievalResult
-from rag.vector_store import InMemoryVectorStore
+from rag.rag.embeddings import Embedder
+from rag.rag.types import Chunk, EmbeddedChunk, RetrievalResult
+from rag.rag.vector_store import InMemoryVectorStore
 
 
 class Retriever:

@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import Iterable, List
 
-from rag.types import EmbeddedChunk, RetrievalResult, SparseVector
+from rag.rag.types import EmbeddedChunk, RetrievalResult, SparseVector
 
 
 def cosine_similarity(a: SparseVector, b: SparseVector) -> float:

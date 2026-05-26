@@ -4,7 +4,7 @@ import re
 from typing import Iterable, List, Protocol
 import math
 
-from rag.types import SparseVector
+from rag.rag.types import SparseVector
 
 
 # A token is a contiguous run of word characters, lowercased. Punctuation is

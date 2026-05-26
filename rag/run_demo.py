@@ -23,11 +23,11 @@ from typing import List
 # Make ``import rag.*`` resolve when running this file directly.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from rag.embeddings import TfIdfEmbedder
-from rag.generation import OllamaChatModel
-from rag.pipeline import RagPipeline
-from rag.retriever import Retriever
-from rag.types import Document
+from rag.rag.embeddings import TfIdfEmbedder
+from rag.rag.generation import OllamaChatModel
+from rag.rag.pipeline import RagPipeline
+from rag.rag.retriever import Retriever
+from rag.rag.types import Document
 
 
 CORPUS_DIR = Path(__file__).resolve().parent / "data" / "corpus"

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
-from rag.types import Chunk, Document
+from rag.rag.types import Chunk, Document
 
 
 def chunk_text(text: str, chunk_size: int, overlap: int) -> List[str]:

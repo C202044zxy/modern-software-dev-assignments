@@ -6,7 +6,7 @@ import math
 
 import pytest
 
-from rag.embeddings import TfIdfEmbedder, tokenize
+from rag.rag.embeddings import TfIdfEmbedder, tokenize
 
 
 # ---------- tokenize ----------

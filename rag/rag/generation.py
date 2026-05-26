@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from typing import List, Protocol
 
-from rag.types import RetrievalResult
+from rag.rag.types import RetrievalResult
 
 
 # The system instruction sent to the LLM. Chosen to push the model toward

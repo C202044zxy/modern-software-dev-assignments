@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from rag.chunking import chunk_document
-from rag.embeddings import TfIdfEmbedder
-from rag.retriever import Retriever
-from rag.types import Chunk
-from rag.vector_store import InMemoryVectorStore
+from rag.rag.chunking import chunk_document
+from rag.rag.embeddings import TfIdfEmbedder
+from rag.rag.retriever import Retriever
+from rag.rag.types import Chunk
+from rag.rag.vector_store import InMemoryVectorStore
 
 
 class TestRetrieverIndex:

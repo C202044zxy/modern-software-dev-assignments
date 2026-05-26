@@ -6,8 +6,8 @@ import math
 
 import pytest
 
-from rag.types import Chunk, EmbeddedChunk
-from rag.vector_store import InMemoryVectorStore, cosine_similarity
+from rag.rag.types import Chunk, EmbeddedChunk
+from rag.rag.vector_store import InMemoryVectorStore, cosine_similarity
 
 
 def _chunk(cid: str, text: str = "") -> Chunk:

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from rag.chunking import chunk_document, chunk_text
-from rag.types import Document
+from rag.rag.chunking import chunk_document, chunk_text
+from rag.rag.types import Document
 
 
 # ---------- chunk_text ----------

@@ -13,6 +13,6 @@ The package is organised so you build the pipeline bottom-up:
 Most modules ship as skeletons; follow ``tutorial.md`` to fill them in.
 """
 
-from rag.types import Chunk, Document, EmbeddedChunk, RetrievalResult
+from rag.rag.types import Chunk, Document, EmbeddedChunk, RetrievalResult
 
 __all__ = ["Chunk", "Document", "EmbeddedChunk", "RetrievalResult"]
