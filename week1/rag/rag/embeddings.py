@@ -1,24 +1,8 @@
-"""Text embeddings.
-
-An *embedding* is a function that maps a string to a vector such that strings
-with similar meaning have vectors with high similarity. RAG depends on
-embeddings because we use vector similarity to decide which chunks of the
-corpus are most relevant to a user's question.
-
-There are many ways to produce embeddings, ranging from very simple
-(bag-of-words, TF-IDF) to very expensive (transformer encoders such as
-``text-embedding-3-small``). In this assignment we implement classical
-TF-IDF from scratch. It is fast, fully deterministic, requires no model
-weights, and — perhaps surprisingly — is a strong baseline for keyword-heavy
-retrieval over a small corpus.
-
-YOU IMPLEMENT: :func:`tokenize`, :class:`TfIdfEmbedder` (``fit`` and ``embed``).
-"""
-
 from __future__ import annotations
 
 import re
 from typing import Iterable, List, Protocol
+import math
 
 from rag.types import SparseVector
 
@@ -32,25 +16,13 @@ _TOKEN_RE = re.compile(r"[A-Za-z0-9]+")
 def tokenize(text: str) -> List[str]:
     """Lowercase ``text`` and split it into a list of alphanumeric tokens.
 
-    Specification:
-      * Tokens are matched by the regular expression ``[A-Za-z0-9]+``.
-      * The output is lowercase.
-      * The empty string and pure-punctuation input both return ``[]``.
-
-    Examples:
-        >>> tokenize("Hello, World!  HTTP/2")
-        ['hello', 'world', 'http', '2']
-        >>> tokenize("")
-        []
-
     Args:
         text: The input string.
 
     Returns:
         The list of tokens in document order, with duplicates preserved.
     """
-    # YOUR CODE HERE (Part 3a) — one line, use _TOKEN_RE.
-    raise NotImplementedError("Implement tokenize — see tutorial.md Part 3.")
+    return _TOKEN_RE.findall(text.lower())
 
 
 class Embedder(Protocol):
@@ -71,76 +43,46 @@ class Embedder(Protocol):
 
 
 class TfIdfEmbedder:
-    """Term-frequency × inverse-document-frequency embedder.
-
-    The score for token ``t`` in document ``d`` (relative to a corpus of
-    ``N`` documents) is::
-
-        tf(t, d)  = number of occurrences of t in d
-        idf(t)    = log( (1 + N) / (1 + df(t)) ) + 1
-        weight    = tf(t, d) * idf(t)
-
-    where ``df(t)`` is the number of documents in the corpus containing ``t``.
-    The final embedding is the resulting sparse vector **L2-normalised**, so
-    that the dot product of two embeddings equals their cosine similarity.
-
-    Why ``log((1+N)/(1+df)) + 1`` rather than ``log(N/df)``?
-
-    * The ``+1`` in the numerator and denominator avoids division by zero and
-      ``log(0)`` for tokens that appear in zero or all documents.
-    * The trailing ``+1`` keeps every IDF strictly positive, so very common
-      tokens still receive a small (but non-zero) weight rather than being
-      discarded entirely.
-
-    This matches scikit-learn's ``TfidfVectorizer(smooth_idf=True)``.
-    """
 
     def __init__(self) -> None:
-        # Mapping from token -> idf weight. Populated by ``fit``. Tokens not
-        # present in ``self.idf`` are out-of-vocabulary and should be ignored
-        # at embed time.
         self.idf: dict[str, float] = {}
-        # Number of documents the embedder was fit on (useful for debugging).
         self.num_documents: int = 0
 
     def fit(self, corpus: Iterable[str]) -> None:
         """Build the vocabulary and IDF table from ``corpus``.
 
-        Steps you must implement:
-          1. Tokenise each document with :func:`tokenize`.
-          2. Compute the document frequency ``df(t)`` — the number of
-             documents in which ``t`` appears at least once.
-          3. Compute ``idf(t) = log((1 + N) / (1 + df(t))) + 1`` for every
-             token. Use :func:`math.log` (natural log).
-          4. Store the result in ``self.idf`` and update ``self.num_documents``.
-
-        After ``fit`` returns, ``self.idf`` must contain exactly one entry per
-        unique token observed in the corpus.
-
         Args:
             corpus: An iterable of document strings.
         """
-        # YOUR CODE HERE (Part 3b)
-        raise NotImplementedError("Implement TfIdfEmbedder.fit — see tutorial.md Part 3.")
+        self.num_documents = 0
+        df: dict[str, int] = {}
+        for text in corpus:
+            self.num_documents += 1
+            tokens = tokenize(text)
+            for token in set(tokens):
+                df[token] = df.get(token, 0) + 1
+
+        self.idf = {t: math.log((1 + self.num_documents) / (1 + df[t])) + 1 for t in df}
 
     def embed(self, text: str) -> SparseVector:
         """Embed ``text`` as an L2-normalised sparse TF-IDF vector.
-
-        Steps you must implement:
-          1. Tokenise ``text``.
-          2. Count term frequencies.
-          3. For each token present in ``self.idf``, compute
-             ``weight = tf * idf``. Out-of-vocabulary tokens are skipped.
-          4. L2-normalise the vector so that ``sum(w*w for w in vec.values())``
-             equals 1. If every weight is zero (e.g. the input has no
-             in-vocabulary tokens), return an empty dict — *do not* divide
-             by zero.
 
         Args:
             text: The input string.
 
         Returns:
             A sparse vector mapping token -> normalised weight.
-        """
-        # YOUR CODE HERE (Part 3c)
-        raise NotImplementedError("Implement TfIdfEmbedder.embed — see tutorial.md Part 3.")
+        """        
+        tokens = tokenize(text)
+        tf: dict[str, int] = {}
+        for token in tokens:
+            tf[token] = tf.get(token, 0) + 1
+        
+        embedding: SparseVector = {t: tf[t] * self.idf[t] for t in tf if t in self.idf}
+        return self._l2_normalize_sparse(embedding)
+
+    def _l2_normalize_sparse(self, vec: SparseVector) -> SparseVector:
+        norm = math.sqrt(sum(v * v for v in vec.values()))
+        if norm == 0:
+            return vec
+        return {k: v / norm for k, v in vec.items()}
