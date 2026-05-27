@@ -74,6 +74,7 @@ class ToolSpec:
 # * Return a *string*. Format it the way you'd want to read it in a chat:
 #   short, human-friendly, no JSON.
 
+
 def handle_geocode_location(client: OpenMeteoClient, args: Dict[str, Any]) -> str:
     """Run the ``geocode_location`` tool.
 
@@ -85,7 +86,8 @@ def handle_geocode_location(client: OpenMeteoClient, args: Dict[str, Any]) -> st
 
         Berlin, Germany — 52.52°N, 13.41°E
     """
-    raise NotImplementedError("Part 3: implement handle_geocode_location")
+    result = client.geocode(args["name"])
+    return f"{result.name}, {result.country} — {result.latitude}°N, {result.longitude}°E"
 
 
 def handle_get_current_weather(client: OpenMeteoClient, args: Dict[str, Any]) -> str:
@@ -102,7 +104,17 @@ def handle_get_current_weather(client: OpenMeteoClient, args: Dict[str, Any]) ->
           Wind:        12.5 km/h
           Conditions:  Overcast (weather code 3)
     """
-    raise NotImplementedError("Part 3: implement handle_get_current_weather")
+    latitude = args["latitude"]
+    longitude = args["longitude"]
+    result = client.get_current_weather(latitude, longitude)
+
+    weather_str = describe_weather_code(result.weather_code)
+    return (
+        f"Current weather at {latitude}, {longitude} (as of {result.observed_at}):\n"
+        f"  Temperature: {result.temperature_c} °C\n"
+        f"  Wind: {result.wind_kph} km/h\n"
+        f"  Conditions: {weather_str}"
+    )
 
 
 def handle_get_forecast(client: OpenMeteoClient, args: Dict[str, Any]) -> str:
@@ -119,7 +131,19 @@ def handle_get_forecast(client: OpenMeteoClient, args: Dict[str, Any]) -> str:
           2025-01-02: 1.2–8.4 °C, 1.3 mm precip, code 61
           ...
     """
-    raise NotImplementedError("Part 3: implement handle_get_forecast")
+    latitude = args["latitude"]
+    longitude = args["longitude"]
+    days = args["days"]
+
+    result = client.get_forecast(latitude, longitude, days)
+    forecast_str = "\n".join(
+        (
+            f"  {day.date}: {day.temp_min_c}-{day.temp_max_c} °C, "
+            f"{day.precipitation_mm} mm precip, code {day.weather_code}"
+        )
+        for day in result.days
+    )
+    return f"{days}-day forecast at {latitude}, {longitude}:\n{forecast_str}"
 
 
 # ---------- weather-code helper --------------------------------------------
@@ -219,7 +243,10 @@ TOOLS: List[ToolSpec] = [
 
 def get_tool(name: str) -> ToolSpec:
     """Look up a tool by name, or raise :class:`ToolError` if unknown."""
-    raise NotImplementedError("Part 3: implement get_tool")
+    for tool in TOOLS:
+        if tool.name == name:
+            return tool
+    raise ToolError(f"tool {name} not found")
 
 
 def call_tool(client: OpenMeteoClient, name: str, arguments: Dict[str, Any]) -> str:
@@ -238,7 +265,9 @@ def call_tool(client: OpenMeteoClient, name: str, arguments: Dict[str, Any]) -> 
 
     Returns the handler's string result.
     """
-    raise NotImplementedError("Part 3: implement call_tool")
+    tool = get_tool(name)
+    validate_arguments(tool.input_schema, arguments)
+    return tool.handler(client, arguments)
 
 
 def validate_arguments(schema: Dict[str, Any], arguments: Dict[str, Any]) -> None:
@@ -261,7 +290,27 @@ def validate_arguments(schema: Dict[str, Any], arguments: Dict[str, Any]) -> Non
     for the LLM, and the handlers (or the upstream API) will reject truly
     invalid values.
     """
-    raise NotImplementedError("Part 3: implement validate_arguments")
+    required_keys = schema["required"]
+    for required_key in required_keys:
+        if required_key not in arguments:
+            raise ToolError(f"{required_key} is required")
+
+    properties = schema["properties"]
+    for key, value in arguments.items():
+        if key not in properties:
+            raise ToolError(f"{key} should not be prompted")
+
+        type = properties[key]["type"]
+        match type:
+            case "string":
+                if not isinstance(value, str):
+                    raise ToolError(f"{key} should be string, but {value} prompted")
+            case "integer":
+                if not isinstance(value, int):
+                    raise ToolError(f"{key} should be int, but {value} prompted")
+            case "number":
+                if not isinstance(value, int) and not isinstance(value, float):
+                    raise ToolError(f"{key} should be int or float, but {value} prompted")
 
 
 __all__ = [
