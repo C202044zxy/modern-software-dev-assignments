@@ -76,7 +76,13 @@ class OpenMeteoClient:
             ToolError: If ``name`` is empty/whitespace, if the API call fails,
                 or if no matches are found.
         """
-        raise NotImplementedError("Part 2: implement OpenMeteoClient.geocode")
+        name = name.strip()
+        if not name:
+            raise ToolError("place name must not be empty")
+
+        # an uncaught exception propagates automatically
+        payload = self._get_json(self.geocode_url, {"name": name, "count": 1})
+        return parse_geocode_response(payload)
 
     def get_current_weather(self, latitude: float, longitude: float) -> CurrentWeather:
         """Fetch the current weather at the given coordinate.
@@ -97,7 +103,13 @@ class OpenMeteoClient:
             ToolError: On any HTTP/transport error, or if the ``current`` block
                 is missing from the response.
         """
-        raise NotImplementedError("Part 2: implement OpenMeteoClient.get_current_weather")
+        params = {
+            "latitude": latitude,
+            "longitude": longitude,
+            "current": "temperature_2m,wind_speed_10m,weather_code",
+        }
+        payload = self._get_json(self.forecast_url, params)
+        return parse_current_weather(payload)
 
     def get_forecast(self, latitude: float, longitude: float, days: int) -> Forecast:
         """Fetch a ``days``-day daily forecast.
@@ -119,7 +131,14 @@ class OpenMeteoClient:
             ToolError: On any HTTP/transport error, on ``days`` out of range,
                 or if the ``daily`` block is missing from the response.
         """
-        raise NotImplementedError("Part 2: implement OpenMeteoClient.get_forecast")
+        params = {
+            "latitude": latitude,
+            "longitude": longitude,
+            "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code",
+            "forecast_days": days,
+        }
+        payload = self._get_json(self.forecast_url, params)
+        return parse_forecast(payload)
 
     # ----- helpers you may find useful -----------------------------------
 
@@ -131,7 +150,29 @@ class OpenMeteoClient:
         each of the three public methods above so error handling stays in
         one place.
         """
-        raise NotImplementedError("Part 2: implement OpenMeteoClient._get_json")
+        try:
+            response = self._client.get(url, params=params)
+        except httpx.TimeoutException as e:
+            raise ToolError("weather API timeout") from e
+        except httpx.RequestError as e:
+            raise ToolError("could not reach weather API") from e
+
+        if response.is_success:
+            try:
+                return response.json()
+            except ValueError as e:
+                raise ToolError("invalid response from weather API") from e
+
+        status = response.status_code
+        match status // 100:
+            case 3:
+                raise ToolError(f"unexpected redirect from weather API ({status})")
+            case 4:
+                raise ToolError(f"weather API rejected request ({status})")
+            case 5:
+                raise ToolError(f"weather service unavailable ({status})")
+
+        raise ToolError(f"unexpected response from weather API ({status})")
 
     def close(self) -> None:
         """Close the underlying HTTP connection pool. Safe to call twice."""
@@ -149,6 +190,7 @@ class OpenMeteoClient:
 # We expose these as module-level functions (not methods) so the test suite
 # can poke at them with synthetic dicts without instantiating the client.
 
+
 def parse_geocode_response(payload: Dict[str, Any]) -> GeocodeResult:
     """Turn a geocoding response payload into a :class:`GeocodeResult`.
 
@@ -158,7 +200,10 @@ def parse_geocode_response(payload: Dict[str, Any]) -> GeocodeResult:
     Raises:
         ToolError: If the payload contains no results.
     """
-    raise NotImplementedError("Part 2: implement parse_geocode_response")
+    if "results" not in payload or not payload["results"]:
+        raise ToolError("payload contains no results")
+    r = payload["results"][0]
+    return GeocodeResult(r["name"], r["country"], r["latitude"], r["longitude"])
 
 
 def parse_current_weather(payload: Dict[str, Any]) -> CurrentWeather:
@@ -176,7 +221,10 @@ def parse_current_weather(payload: Dict[str, Any]) -> CurrentWeather:
     Raises:
         ToolError: If the payload has no ``current`` block.
     """
-    raise NotImplementedError("Part 2: implement parse_current_weather")
+    if "current" not in payload:
+        raise ToolError("payload has no current block")
+    c = payload["current"]
+    return CurrentWeather(c["temperature_2m"], c["wind_speed_10m"], c["weather_code"], c["time"])
 
 
 def parse_forecast(payload: Dict[str, Any]) -> Forecast:
@@ -199,7 +247,27 @@ def parse_forecast(payload: Dict[str, Any]) -> Forecast:
         ToolError: If the payload has no ``daily`` block, or if the arrays
             are not all the same length.
     """
-    raise NotImplementedError("Part 2: implement parse_forecast")
+    if "daily" not in payload:
+        raise ToolError("payload has no daily block")
+    d = payload["daily"]
+    rows = zip(
+        d["time"],
+        d["temperature_2m_max"],
+        d["temperature_2m_min"],
+        d["precipitation_sum"],
+        d["weather_code"],
+        strict=True,
+    )
+
+    forecast = Forecast([])
+    try:
+        for time, temp_max, temp_min, precipitation_mm, weather_code in rows:
+            forecast.days.append(
+                ForecastDay(time, temp_max, temp_min, precipitation_mm, weather_code)
+            )
+    except ValueError as e:
+        raise ToolError("the arrays are not all the same length") from e
+    return forecast
 
 
 # Public re-exports so the rest of the package can `from server.client import X`.
