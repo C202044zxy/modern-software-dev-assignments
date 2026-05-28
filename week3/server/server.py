@@ -21,7 +21,7 @@ import logging
 from typing import List
 
 from mcp.server import Server
-from mcp.types import TextContent, Tool
+from mcp.types import CallToolResult, TextContent, Tool
 
 from server.client import OpenMeteoClient
 from server.tools import TOOLS, call_tool
@@ -55,14 +55,18 @@ def build_server(client: OpenMeteoClient | None = None) -> Server:
     """
     srv = Server("weather")
 
+    if client is None:
+        client = OpenMeteoClient()
+
     @srv.list_tools()
     async def list_tools() -> list[Tool]:
         return tools_for_protocol()
 
     @srv.call_tool()
     async def call_tool(name: str, arguments: dict):
-        return run_tool_as_content(client, name, arguments)
-    
+        content, is_error = run_tool_as_content(client, name, arguments)
+        return CallToolResult(content=content, isError=is_error)
+
     return srv
 
 
