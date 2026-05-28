@@ -53,7 +53,17 @@ def build_server(client: OpenMeteoClient | None = None) -> Server:
         A fully configured :class:`Server`, ready to be passed to a
         transport (e.g. ``stdio_server``).
     """
-    raise NotImplementedError("Part 4: implement build_server")
+    srv = Server("weather")
+
+    @srv.list_tools()
+    async def list_tools() -> list[Tool]:
+        return tools_for_protocol()
+
+    @srv.call_tool()
+    async def call_tool(name: str, arguments: dict):
+        return run_tool_as_content(client, name, arguments)
+    
+    return srv
 
 
 def tools_for_protocol() -> List[Tool]:
@@ -64,7 +74,10 @@ def tools_for_protocol() -> List[Tool]:
     ``inputSchema`` — which matches our :class:`~server.tools.ToolSpec`
     exactly, modulo the casing of ``inputSchema``.
     """
-    raise NotImplementedError("Part 4: implement tools_for_protocol")
+    return [
+        Tool(name=tool.name, description=tool.description, inputSchema=tool.input_schema)
+        for tool in TOOLS
+    ]
 
 
 def run_tool_as_content(
@@ -81,7 +94,13 @@ def run_tool_as_content(
         list of :class:`TextContent` and ``is_error`` is ``True`` iff a
         :class:`ToolError` was caught.
     """
-    raise NotImplementedError("Part 4: implement run_tool_as_content")
+    try:
+        response = call_tool(client, name, arguments)
+        text_content = TextContent(type="text", text=response)
+        return ([text_content], False)
+    except ToolError as e:
+        text_content = TextContent(type="text", text=str(e.message))
+        return ([text_content], True)
 
 
 __all__ = ["build_server", "tools_for_protocol", "run_tool_as_content"]
