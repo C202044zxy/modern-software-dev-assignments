@@ -43,7 +43,6 @@ class Embedder(Protocol):
 
 
 class TfIdfEmbedder:
-
     def __init__(self) -> None:
         self.idf: dict[str, float] = {}
         self.num_documents: int = 0

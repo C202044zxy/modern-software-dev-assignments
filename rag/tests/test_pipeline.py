@@ -27,7 +27,7 @@ class TestFormatRagPrompt:
             "What is X?",
             [_result("a:0", "alpha doc"), _result("b:0", "beta doc")],
         )
-        expected = "Context:\n" "[a:0] alpha doc\n" "[b:0] beta doc\n" "\n" "Question: What is X?"
+        expected = "Context:\n[a:0] alpha doc\n[b:0] beta doc\n\nQuestion: What is X?"
         assert prompt == expected
 
     def test_preserves_retrieval_order(self):
