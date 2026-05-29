@@ -36,7 +36,7 @@ Create a note.
 
 ### `GET /notes/search/`
 
-Search notes by substring. Matches notes whose `title` **or** `content` contains `q` (case-sensitive substring match). When `q` is omitted or empty, returns all notes.
+Search notes by substring. Matches notes whose `title` **or** `content` contains `q` (case-insensitive substring match — SQLite `LIKE` is case-insensitive for ASCII). When `q` is omitted or empty, returns all notes.
 
 > Declared before `GET /notes/{note_id}` so the literal `search/` path is not captured by the `{note_id}` converter.
 
@@ -53,6 +53,37 @@ Fetch a single note by id.
   - `note_id` *(integer, required)*
 - **Response `200`:** [`NoteRead`](#noteread)
 - **Response `404`:** `{"detail": "Note not found"}` *(not present in the OpenAPI schema; raised via `HTTPException`)*
+- **Response `422`:** [`HTTPValidationError`](#httpvalidationerror)
+
+### `PUT /notes/{note_id}`
+
+Update a note's `title` and `content`.
+
+- **Path params:**
+  - `note_id` *(integer, required)*
+- **Request body:** [`NoteCreate`](#notecreate)
+- **Response `200`:** [`NoteRead`](#noteread)
+- **Response `404`:** `{"detail": "Note not found"}` *(raised via `HTTPException`)*
+- **Response `422`:** [`HTTPValidationError`](#httpvalidationerror)
+
+### `DELETE /notes/{note_id}`
+
+Delete a note.
+
+- **Path params:**
+  - `note_id` *(integer, required)*
+- **Response `204`:** no body
+- **Response `404`:** `{"detail": "Note not found"}` *(raised via `HTTPException`)*
+- **Response `422`:** [`HTTPValidationError`](#httpvalidationerror)
+
+### `POST /notes/{note_id}/extract`
+
+Parse the note's `content` into action items (lines ending in `!` or starting with `todo:`), persist them as new action items, and return them.
+
+- **Path params:**
+  - `note_id` *(integer, required)*
+- **Response `201`:** array of [`ActionItemRead`](#actionitemread)
+- **Response `404`:** `{"detail": "Note not found"}` *(raised via `HTTPException`)*
 - **Response `422`:** [`HTTPValidationError`](#httpvalidationerror)
 
 ## Action Items
@@ -88,10 +119,10 @@ Mark an action item as completed (`completed = true`).
 
 ### NoteCreate
 
-| Field | Type | Required |
-|-------|------|----------|
-| `title` | string | yes |
-| `content` | string | yes |
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `title` | string | yes | `min_length=1` (empty string → 422) |
+| `content` | string | yes | `min_length=1` (empty string → 422) |
 
 ### NoteRead
 
@@ -103,9 +134,9 @@ Mark an action item as completed (`completed = true`).
 
 ### ActionItemCreate
 
-| Field | Type | Required |
-|-------|------|----------|
-| `description` | string | yes |
+| Field | Type | Required | Constraints |
+|-------|------|----------|-------------|
+| `description` | string | yes | `min_length=1` (empty string → 422) |
 
 ### ActionItemRead
 

@@ -1,0 +1,19 @@
+# Pre-commit hooks for the repo.
+# Runs black (formatting) and ruff (lint, with autofix) on staged Python files.
+# Config for both tools lives in pyproject.toml (line-length 100; ruff ignores E501, B008).
+# Uses the project's already-installed tools (poetry/conda env `cs146s`) via system hooks.
+repos:
+  - repo: local
+    hooks:
+      - id: black
+        name: black
+        entry: black
+        language: system
+        types: [python]
+        files: ^week4/
+      - id: ruff
+        name: ruff
+        entry: ruff check --fix
+        language: system
+        types: [python]
+        files: ^week4/

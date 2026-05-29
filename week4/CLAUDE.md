@@ -41,3 +41,12 @@ The conda env is `cs146s` (Python 3.12); dependencies are managed by Poetry at t
 1. Add/update the Pydantic schema in `schemas.py` and the ORM model in `models.py` (and `data/seed.sql` if the schema changes).
 2. Add the route to the relevant router; validate ORM → schema with `model_validate`.
 3. Add a test in `backend/tests/` using the `client` fixture, then run `make test` and `make lint`.
+
+## GitHub workflow
+
+- **Branching**: never commit feature work directly to `master`. Branch first, using a `type/short-description` name: `feat/notes-search`, `fix/action-item-404`, `chore/pre-commit`, `docs/api-md`. One logical change per branch.
+- **Commits**: keep them scoped to a single week's directory when possible — this is a multi-week monorepo, so do **not** sweep unrelated cross-week edits into a week4 commit (`git add` explicit paths, not `git add -A`). Message format mirrors existing history: `Type: imperative summary` (e.g. `Feat: add notes search endpoint`, `Fix: return 404 on missing action item`). End commit messages with the `Co-Authored-By` trailer.
+- **Pre-commit**: hooks live in the repo-root `.pre-commit-config.yaml` (black + ruff, scoped to `^week4/`). Run `pre-commit install` once; `pre-commit run --all-files` must pass before pushing.
+- **Pull requests**: open a PR against `master` via `gh pr create`. PR must be green on CI before merge; include a short summary and the `make test` / `make lint` results in the body.
+- **CI expectations**: every push/PR is expected to run, from `week4/`, `make test` (pytest) and `make lint` (ruff) on Python 3.12. Keep both green — a red suite or lint failure blocks merge. Coverage is informational (`make test` + `--cov`), not a hard gate.
+- **Do not commit**: generated/local artifacts such as `.coverage`, `data/app.db`, or `__pycache__/` (see `.gitignore`).

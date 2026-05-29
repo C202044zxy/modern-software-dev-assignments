@@ -1,16 +1,47 @@
 async function fetchJSON(url, options) {
   const res = await fetch(url, options);
   if (!res.ok) throw new Error(await res.text());
+  if (res.status === 204) return null;
   return res.json();
 }
 
-async function loadNotes() {
+async function loadNotes(query) {
   const list = document.getElementById('notes');
   list.innerHTML = '';
-  const notes = await fetchJSON('/notes/');
+  const url = query ? `/notes/search/?q=${encodeURIComponent(query)}` : '/notes/';
+  const notes = await fetchJSON(url);
   for (const n of notes) {
     const li = document.createElement('li');
-    li.textContent = `${n.title}: ${n.content}`;
+
+    const text = document.createElement('span');
+    text.textContent = `${n.title}: ${n.content}`;
+    li.appendChild(text);
+
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Edit';
+    editBtn.onclick = async () => {
+      const title = prompt('Title', n.title);
+      if (title === null) return;
+      const content = prompt('Content', n.content);
+      if (content === null) return;
+      await fetchJSON(`/notes/${n.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, content }),
+      });
+      loadNotes(query);
+    };
+    li.appendChild(editBtn);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.onclick = async () => {
+      if (!confirm('Delete this note?')) return;
+      await fetchJSON(`/notes/${n.id}`, { method: 'DELETE' });
+      loadNotes(query);
+    };
+    li.appendChild(deleteBtn);
+
     list.appendChild(li);
   }
 }
@@ -59,6 +90,17 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     e.target.reset();
     loadActions();
+  });
+
+  document.getElementById('search-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const query = document.getElementById('note-search').value.trim();
+    loadNotes(query);
+  });
+
+  document.getElementById('search-clear').addEventListener('click', () => {
+    document.getElementById('note-search').value = '';
+    loadNotes();
   });
 
   loadNotes();
