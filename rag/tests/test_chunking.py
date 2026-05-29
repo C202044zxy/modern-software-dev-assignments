@@ -7,8 +7,8 @@ import pytest
 from rag.rag.chunking import chunk_document, chunk_text
 from rag.rag.types import Document
 
-
 # ---------- chunk_text ----------
+
 
 class TestChunkText:
     def test_empty_string_returns_empty_list(self):
@@ -75,6 +75,7 @@ class TestChunkText:
 
 
 # ---------- chunk_document ----------
+
 
 class TestChunkDocument:
     def test_returns_chunks_with_correct_doc_id_and_index(self):

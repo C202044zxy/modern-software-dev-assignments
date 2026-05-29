@@ -4,17 +4,15 @@ from __future__ import annotations
 
 import httpx
 import pytest
-
 from server.client import (
-    OpenMeteoClient,
     parse_current_weather,
     parse_forecast,
     parse_geocode_response,
 )
 from server.types import CurrentWeather, ForecastDay, ToolError
 
-
 # ---------- response parsers --------------------------------------------------
+
 
 class TestParseGeocodeResponse:
     def test_returns_first_match(self, berlin_geocode_payload):
@@ -80,6 +78,7 @@ class TestParseForecast:
 
 # ---------- OpenMeteoClient.geocode ------------------------------------------
 
+
 class TestClientGeocode:
     def test_returns_first_match(self, mock_client, mock_router, berlin_geocode_payload):
         mock_router[("GET", "/v1/search")] = lambda req: httpx.Response(
@@ -106,9 +105,7 @@ class TestClientGeocode:
             mock_client.geocode("   ")
 
     def test_no_results_raises(self, mock_client, mock_router):
-        mock_router[("GET", "/v1/search")] = lambda req: httpx.Response(
-            200, json={"results": []}
-        )
+        mock_router[("GET", "/v1/search")] = lambda req: httpx.Response(200, json={"results": []})
         with pytest.raises(ToolError):
             mock_client.geocode("Nowhereville")
 
@@ -126,14 +123,13 @@ class TestClientGeocode:
             mock_client.geocode("Berlin")
 
     def test_rate_limit_raises_tool_error(self, mock_client, mock_router):
-        mock_router[("GET", "/v1/search")] = lambda req: httpx.Response(
-            429, text="slow down"
-        )
+        mock_router[("GET", "/v1/search")] = lambda req: httpx.Response(429, text="slow down")
         with pytest.raises(ToolError):
             mock_client.geocode("Berlin")
 
 
 # ---------- OpenMeteoClient.get_current_weather ------------------------------
+
 
 class TestClientCurrentWeather:
     def test_happy_path(self, mock_client, mock_router, berlin_current_payload):
@@ -170,6 +166,7 @@ class TestClientCurrentWeather:
 
 
 # ---------- OpenMeteoClient.get_forecast -------------------------------------
+
 
 class TestClientForecast:
     def test_happy_path(self, mock_client, mock_router, berlin_forecast_payload):

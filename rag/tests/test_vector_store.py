@@ -20,6 +20,7 @@ def _embedded(cid: str, vec: dict) -> EmbeddedChunk:
 
 # ---------- cosine_similarity ----------
 
+
 class TestCosineSimilarity:
     def test_identical_unit_vectors_score_one(self):
         # Already unit-norm: a single coordinate with magnitude 1.
@@ -53,6 +54,7 @@ class TestCosineSimilarity:
 
 # ---------- InMemoryVectorStore ----------
 
+
 class TestInMemoryVectorStore:
     def test_empty_store_has_length_zero(self):
         store = InMemoryVectorStore()
@@ -70,11 +72,13 @@ class TestInMemoryVectorStore:
 
     def test_search_returns_top_k_in_descending_order(self):
         store = InMemoryVectorStore()
-        store.add([
-            _embedded("a:0", {"x": 1.0}),  # cos with query = 1.0
-            _embedded("b:0", {"x": 1 / math.sqrt(2), "y": 1 / math.sqrt(2)}),  # ~0.707
-            _embedded("c:0", {"y": 1.0}),  # 0
-        ])
+        store.add(
+            [
+                _embedded("a:0", {"x": 1.0}),  # cos with query = 1.0
+                _embedded("b:0", {"x": 1 / math.sqrt(2), "y": 1 / math.sqrt(2)}),  # ~0.707
+                _embedded("c:0", {"y": 1.0}),  # 0
+            ]
+        )
         results = store.search({"x": 1.0}, k=2)
         assert [r.chunk.id for r in results] == ["a:0", "b:0"]
         assert results[0].score >= results[1].score
@@ -82,10 +86,12 @@ class TestInMemoryVectorStore:
 
     def test_search_k_larger_than_store_returns_all(self):
         store = InMemoryVectorStore()
-        store.add([
-            _embedded("a:0", {"x": 1.0}),
-            _embedded("b:0", {"y": 1.0}),
-        ])
+        store.add(
+            [
+                _embedded("a:0", {"x": 1.0}),
+                _embedded("b:0", {"y": 1.0}),
+            ]
+        )
         results = store.search({"x": 1.0}, k=10)
         assert len(results) == 2
 

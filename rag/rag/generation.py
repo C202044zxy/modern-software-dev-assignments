@@ -17,7 +17,6 @@ from typing import List, Protocol
 
 from rag.rag.types import RetrievalResult
 
-
 # The system instruction sent to the LLM. Chosen to push the model toward
 # extractive answers grounded in the supplied context rather than parametric
 # (memorised) recall. You may experiment with this for the demo, but the tests
@@ -25,7 +24,7 @@ from rag.rag.types import RetrievalResult
 DEFAULT_SYSTEM_PROMPT = (
     "You are a careful assistant. Answer the user's question using ONLY the "
     "information in the supplied context. If the context does not contain the "
-    "answer, reply exactly: \"I don't know based on the provided context.\" "
+    'answer, reply exactly: "I don\'t know based on the provided context." '
     "Cite the source id in square brackets after each fact, e.g. [users_api:0]."
 )
 
@@ -76,8 +75,7 @@ class LanguageModel(Protocol):
     assistant's reply as a single string.
     """
 
-    def __call__(self, system: str, user: str) -> str:
-        ...
+    def __call__(self, system: str, user: str) -> str: ...
 
 
 # ---------------------------------------------------------------------- #

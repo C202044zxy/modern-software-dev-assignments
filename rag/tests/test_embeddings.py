@@ -8,8 +8,8 @@ import pytest
 
 from rag.rag.embeddings import TfIdfEmbedder, tokenize
 
-
 # ---------- tokenize ----------
+
 
 class TestTokenize:
     def test_basic(self):
@@ -36,6 +36,7 @@ class TestTokenize:
 
 
 # ---------- TfIdfEmbedder.fit ----------
+
 
 class TestTfIdfEmbedderFit:
     def test_records_num_documents(self):
@@ -76,14 +77,17 @@ class TestTfIdfEmbedderFit:
 
 # ---------- TfIdfEmbedder.embed ----------
 
+
 class TestTfIdfEmbedderEmbed:
     def _fitted(self):
         e = TfIdfEmbedder()
-        e.fit([
-            "the cat sat on the mat",
-            "the dog sat on the log",
-            "the bird flew",
-        ])
+        e.fit(
+            [
+                "the cat sat on the mat",
+                "the dog sat on the log",
+                "the bird flew",
+            ]
+        )
         return e
 
     def test_embedding_is_l2_normalised(self):

@@ -11,7 +11,8 @@ YOU IMPLEMENT: :func:`cosine_similarity` and :class:`InMemoryVectorStore`.
 
 from __future__ import annotations
 
-from typing import Iterable, List
+from collections.abc import Iterable
+from typing import List
 
 from rag.rag.types import EmbeddedChunk, RetrievalResult, SparseVector
 

@@ -7,7 +7,6 @@ from fastapi import APIRouter, HTTPException
 from .. import db
 from ..services.extract import extract_action_items
 
-
 router = APIRouter(prefix="/action-items", tags=["action-items"])
 
 
@@ -46,5 +45,3 @@ def mark_done(action_item_id: int, payload: Dict[str, Any]) -> Dict[str, Any]:
     done = bool(payload.get("done", True))
     db.mark_action_item_done(action_item_id, done)
     return {"id": action_item_id, "done": done}
-
-

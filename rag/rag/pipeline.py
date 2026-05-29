@@ -18,8 +18,7 @@ from __future__ import annotations
 
 from typing import List
 
-from rag.rag.chunking import chunk_document
-from rag.rag.generation import DEFAULT_SYSTEM_PROMPT, LanguageModel, format_rag_prompt
+from rag.rag.generation import DEFAULT_SYSTEM_PROMPT, LanguageModel
 from rag.rag.retriever import Retriever
 from rag.rag.types import Document
 

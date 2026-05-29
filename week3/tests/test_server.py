@@ -15,9 +15,9 @@ import pytest
 pytest.importorskip("mcp")
 
 from mcp.types import TextContent  # noqa: E402
-
 from server.server import build_server, run_tool_as_content, tools_for_protocol  # noqa: E402
-from server.types import GeocodeResult, ToolError  # noqa: E402
+from server.types import ToolError  # noqa: E402
+
 from tests.test_tools import FakeClient, _fake_geocode  # noqa: E402
 
 
@@ -45,9 +45,7 @@ class TestToolsForProtocol:
 class TestRunToolAsContent:
     def test_success_returns_text_content_no_error(self):
         client = FakeClient(geocode=_fake_geocode())
-        content, is_error = run_tool_as_content(
-            client, "geocode_location", {"name": "Berlin"}
-        )
+        content, is_error = run_tool_as_content(client, "geocode_location", {"name": "Berlin"})
         assert is_error is False
         assert len(content) == 1
         assert isinstance(content[0], TextContent)
@@ -55,9 +53,7 @@ class TestRunToolAsContent:
 
     def test_tool_error_returns_is_error_true(self):
         client = FakeClient(geocode=ToolError("no such place"))
-        content, is_error = run_tool_as_content(
-            client, "geocode_location", {"name": "Atlantis"}
-        )
+        content, is_error = run_tool_as_content(client, "geocode_location", {"name": "Atlantis"})
         assert is_error is True
         assert len(content) == 1
         assert isinstance(content[0], TextContent)

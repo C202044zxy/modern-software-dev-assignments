@@ -26,7 +26,6 @@ if str(_ASSIGNMENT_ROOT) not in sys.path:
 # Imported AFTER sys.path is set up.
 from server.client import OpenMeteoClient  # noqa: E402
 
-
 RouterKey = Tuple[str, str]  # (method, path)
 RouterFn = Callable[[httpx.Request], httpx.Response]
 
@@ -72,6 +71,7 @@ def mock_client(monkeypatch: pytest.MonkeyPatch, mock_router) -> OpenMeteoClient
 
 
 # ---------- canned payloads ------------------------------------------------
+
 
 @pytest.fixture
 def berlin_geocode_payload() -> dict:

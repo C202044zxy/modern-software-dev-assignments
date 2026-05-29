@@ -29,7 +29,6 @@ from typing import Any, Callable, Dict, List
 from server.client import OpenMeteoClient
 from server.types import ToolError
 
-
 # ---------- registry types --------------------------------------------------
 
 # Handlers take an ``OpenMeteoClient`` and the already-validated arguments

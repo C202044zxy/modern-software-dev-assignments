@@ -1,5 +1,5 @@
-import os
 import re
+
 from dotenv import load_dotenv
 from ollama import chat
 
@@ -80,5 +80,3 @@ def test_your_prompt(system_prompt: str) -> bool:
 
 if __name__ == "__main__":
     test_your_prompt(YOUR_SYSTEM_PROMPT)
-
-

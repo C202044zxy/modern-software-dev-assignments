@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-import os
 import re
 from typing import List
-import json
-from typing import Any
-from ollama import chat
+
 from dotenv import load_dotenv
 
 load_dotenv()

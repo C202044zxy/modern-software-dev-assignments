@@ -29,7 +29,6 @@ from rag.rag.pipeline import RagPipeline
 from rag.rag.retriever import Retriever
 from rag.rag.types import Document
 
-
 CORPUS_DIR = Path(__file__).resolve().parent / "data" / "corpus"
 
 
@@ -96,6 +95,7 @@ def main() -> int:
         # without Ollama installed.
         def llm(system: str, user: str) -> str:
             return "<dry-run: LLM not called>"
+
     else:
         llm = OllamaChatModel(model=args.model)
 

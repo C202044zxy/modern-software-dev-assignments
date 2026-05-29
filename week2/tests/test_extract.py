@@ -1,6 +1,3 @@
-import os
-import pytest
-
 from ..app.services.extract import extract_action_items
 
 

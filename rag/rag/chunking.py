@@ -24,12 +24,12 @@ def chunk_text(text: str, chunk_size: int, overlap: int) -> List[str]:
         raise ValueError("chunk_size should be positive")
     if overlap < 0 or overlap >= chunk_size:
         raise ValueError("0 <= overlap < chunk_size should be satisfied")
-    
+
     tokens = text.split()
     step = chunk_size - overlap
     chunks: List[str] = []
     for i in range(0, len(tokens), step):
-        chunks.append(" ".join(tokens[i: i + chunk_size]))
+        chunks.append(" ".join(tokens[i : i + chunk_size]))
         if i + chunk_size >= len(tokens):
             break
     return chunks
@@ -52,6 +52,6 @@ def chunk_document(doc: Document, chunk_size: int, overlap: int) -> List[Chunk]:
     chunks_str = chunk_text(doc.text, chunk_size, overlap)
     chunks: List[Chunk] = []
     for i, chunk_str in enumerate(chunks_str):
-        id = "{doc_id}:{chunk_index}".format(doc_id=doc.id, chunk_index=i)
+        id = f"{doc.id}:{i}"
         chunks.append(Chunk(id, doc.id, i, chunk_str))
     return chunks

@@ -178,7 +178,7 @@ class OpenMeteoClient:
         """Close the underlying HTTP connection pool. Safe to call twice."""
         self._client.close()
 
-    def __enter__(self) -> "OpenMeteoClient":
+    def __enter__(self) -> OpenMeteoClient:
         return self
 
     def __exit__(self, *exc_info: object) -> None:

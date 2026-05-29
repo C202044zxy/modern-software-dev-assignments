@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import re
-from typing import Iterable, List, Protocol
 import math
+import re
+from collections.abc import Iterable
+from typing import List, Protocol
 
 from rag.rag.types import SparseVector
-
 
 # A token is a contiguous run of word characters, lowercased. Punctuation is
 # discarded. This is intentionally simple — production systems use much more
@@ -72,12 +72,12 @@ class TfIdfEmbedder:
 
         Returns:
             A sparse vector mapping token -> normalised weight.
-        """        
+        """
         tokens = tokenize(text)
         tf: dict[str, int] = {}
         for token in tokens:
             tf[token] = tf.get(token, 0) + 1
-        
+
         embedding: SparseVector = {t: tf[t] * self.idf[t] for t in tf if t in self.idf}
         return self._l2_normalize_sparse(embedding)
 

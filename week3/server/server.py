@@ -27,7 +27,6 @@ from server.client import OpenMeteoClient
 from server.tools import TOOLS, call_tool
 from server.types import ToolError
 
-
 logger = logging.getLogger(__name__)
 
 

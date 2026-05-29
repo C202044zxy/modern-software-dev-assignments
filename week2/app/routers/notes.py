@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from fastapi import APIRouter, HTTPException
 
 from .. import db
-
 
 router = APIRouter(prefix="/notes", tags=["notes"])
 
@@ -30,5 +29,3 @@ def get_single_note(note_id: int) -> Dict[str, Any]:
     if row is None:
         raise HTTPException(status_code=404, detail="note not found")
     return {"id": row["id"], "content": row["content"], "created_at": row["created_at"]}
-
-

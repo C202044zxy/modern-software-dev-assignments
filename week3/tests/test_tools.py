@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
-import httpx
 import pytest
-
-from server.client import OpenMeteoClient
 from server.tools import (
     TOOLS,
     call_tool,
@@ -17,8 +14,8 @@ from server.tools import (
 )
 from server.types import ToolError
 
-
 # ---------- registry ---------------------------------------------------------
+
 
 class TestToolRegistry:
     def test_three_tools_registered(self):
@@ -42,6 +39,7 @@ class TestToolRegistry:
 
 
 # ---------- validate_arguments ------------------------------------------------
+
 
 class TestValidateArguments:
     SCHEMA = {
@@ -79,6 +77,7 @@ class TestValidateArguments:
 
 # ---------- describe_weather_code -------------------------------------------
 
+
 class TestDescribeWeatherCode:
     def test_known_code(self):
         s = describe_weather_code(3)
@@ -93,6 +92,7 @@ class TestDescribeWeatherCode:
 # ---------- handlers ---------------------------------------------------------
 #
 # We drive these through call_tool() so we also exercise the dispatcher.
+
 
 class FakeClient:
     """Stand-in for OpenMeteoClient that records the calls it received."""

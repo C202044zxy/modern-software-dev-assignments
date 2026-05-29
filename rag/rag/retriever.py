@@ -16,10 +16,11 @@ YOU IMPLEMENT: :class:`Retriever`.
 
 from __future__ import annotations
 
-from typing import Iterable, List
+from collections.abc import Iterable
+from typing import List
 
 from rag.rag.embeddings import Embedder
-from rag.rag.types import Chunk, EmbeddedChunk, RetrievalResult
+from rag.rag.types import Chunk, RetrievalResult
 from rag.rag.vector_store import InMemoryVectorStore
 
 

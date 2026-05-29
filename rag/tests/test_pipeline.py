@@ -20,19 +20,14 @@ def _result(cid: str, text: str, score: float = 1.0) -> RetrievalResult:
 
 # ---------- format_rag_prompt ----------
 
+
 class TestFormatRagPrompt:
     def test_basic_layout(self):
         prompt = format_rag_prompt(
             "What is X?",
             [_result("a:0", "alpha doc"), _result("b:0", "beta doc")],
         )
-        expected = (
-            "Context:\n"
-            "[a:0] alpha doc\n"
-            "[b:0] beta doc\n"
-            "\n"
-            "Question: What is X?"
-        )
+        expected = "Context:\n" "[a:0] alpha doc\n" "[b:0] beta doc\n" "\n" "Question: What is X?"
         assert prompt == expected
 
     def test_preserves_retrieval_order(self):
@@ -54,6 +49,7 @@ class TestFormatRagPrompt:
 
 
 # ---------- RagPipeline ----------
+
 
 class TestRagPipeline:
     def _pipeline(self, mini_corpus, llm: FakeLLM) -> RagPipeline:
