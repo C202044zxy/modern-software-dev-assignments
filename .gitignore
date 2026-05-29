@@ -52,3 +52,7 @@ Thumbs.db
 
 # Vercel
 .vercel/*
+
+# Claude Code (local/personal)
+**/.claude/settings.local.json
+**/.claude/agent-memory/
